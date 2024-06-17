@@ -1,12 +1,25 @@
 import { Router } from "express";
-import {ProdutoController}
+import { AppDataSource } from "../index";
+import { DataSource } from "typeorm";
+import { ProdutoRepository } from "../models/repositories/ProdutoRepositorio";
+import { Produto } from "../models/Produto";
+import { ProdutoServiceImpl } from "../services/Impl/ProdutoServiceImpl";
+import { ProdutoController } from "../controllers/produto";
 
-const router = Router();
+export class ProdutoRouter {
+  public router: Router;
 
-const controller = new ProdutoController();
+  constructor(dataSource: DataSource) {
+    this.router = Router();
+    this.iniciar(dataSource);
+  }
 
-router.post("/login", controller.login);
-
-router.post("/signup", controller.signup);
-
-export default router;
+  iniciar(dataSource: DataSource) {
+    console.log("iniciando rota produtos");
+    const repository = new ProdutoRepository(dataSource.getRepository(Produto));
+    const service = new ProdutoServiceImpl(repository);
+    const controller = new ProdutoController(service);
+    this.router.get("/:id", controller.leProduto);
+    this.router.post("/", controller.criaProduto);
+  }
+}
