@@ -1,25 +1,25 @@
-import { Produto } from "../Produto"
-import { AppDataSource } from "../../index"
-import { Repository } from "typeorm"
+import { Produto } from "../Produto";
+import { AppDataSource } from "../../index";
+import { Repository } from "typeorm";
 
-export class ProdutoRepository{
+export class ProdutoRepository {
+  private repository: Repository<Produto>;
 
-    private repository: Repository<Produto>
+  constructor(repository: Repository<Produto>) {
+    this.repository = repository;
+  }
 
-    constructor(){this.repository=AppDataSource.getRepository(Produto)}
+  async create(p: Produto): Promise<Produto> {
+    const novoProduto = this.repository.create(p);
+    await this.repository.save(novoProduto);
+    return novoProduto;
+  }
 
-    async create(p: Produto): Promise<void> {
-        const novoProduto = this.repository.create(p)
-        await this.repository.save(novoProduto)
-    }
+  async findOne(id: number): Promise<Produto | null> {
+    return this.repository.findOneBy({ id });
+  }
 
-    async findOne(id: number): Promise<Produto | null> {
-        return this.repository.findOneBy({id});
-    }
-
-    async findAll(): Promise<Produto[]> {
-        return this.repository.find()
-    }
-
+  async findAll(): Promise<Produto[]> {
+    return this.repository.find();
+  }
 }
-
